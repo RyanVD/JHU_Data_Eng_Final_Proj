@@ -41,10 +41,7 @@ for the full dataset writeup (join columns, field descriptions, sample data).
 
 **Requires:** Docker Desktop only.
 
-1. Copy the env file and add your own FRED API key (free, instant signup at
-   [fred.stlouisfed.org](https://fred.stlouisfed.org/docs/api/api_key.html) —
-   don't share keys between teammates, everyone should use their own):
-   ```bash
+1. Copy the env file and add yours or my api key from whatsapp
    cp .env.example .env
    # then edit .env and set FRED_API_KEY=...
    ```
@@ -56,7 +53,7 @@ for the full dataset writeup (join columns, field descriptions, sample data).
    ```bash
    docker compose ps
    ```
-3. Access:
+3. Local host access:
    - **JupyterLab:** http://localhost:8888 (no login token)
    - **Airflow UI:** http://localhost:8080 (admin/admin)
    - **Flask API:** http://localhost:5000 (not built yet — see Status below)
@@ -94,39 +91,18 @@ writes to the final `Dim_*`/`Fact_*` tables until `04_join_data.ipynb`.
 transform step. `04_join_data.ipynb` truncates and reloads all `Dim_*`/`Fact_*`
 tables each time it runs, so it's safe to re-run after re-running `01`-`03`.
 
-## Known gotchas (save yourself the debugging time)
+## recorded errors
 
 - **`pandas` must stay pinned to `2.1.4`** in the Dockerfile. Airflow 2.9.3
   hard-pins `SQLAlchemy==1.4.52`; pandas 2.2+ dropped full support for
   SQLAlchemy <2.0 and silently breaks `to_sql`/`read_sql` with
   `AttributeError: 'Engine' object has no attribute 'cursor'` if you bump it.
-- **CDC PLACES and HUD source CSVs need `encoding="cp1252"`** when read with
-  pandas — they're Windows/Excel exports with curly-quote characters that
-  aren't valid UTF-8.
-- **The HUD PIT export has junk rows** at the bottom (a blank row, a "Total"
-  summary row, footnote text) that parse as if they were real CoC records —
-  filtered out in `03_extract_HUD.ipynb` via a regex on the CoC code shape.
-- **The crosswalk's `pct_cnty_pop_coc` column measures "% of this county
-  inside the CoC," not "% of the CoC in this county."** For multi-county
-  CoCs, using it directly gives every member county a ~100% weight, which
-  would multiply-count that CoC's homeless total if summed across counties.
-  `03_extract_HUD.ipynb` normalizes it within each CoC group instead, so
-  each CoC's per-county weights sum to 1.
-- **`Dockerfile` must be named exactly `Dockerfile`, no extension** — Notepad
-  silently appends `.txt` unless you explicitly choose "All Files" on save.
 
 ## Status / what's left
+TODO — next up
 
-The full pipeline (all four notebooks) runs end-to-end and has been verified
-with a real 3-way join across all three fact tables. See the team task list
-(pinned in [wherever you're sharing this — Discord/Canvas/etc.]) for the
-current breakdown of remaining work: the Airflow DAG (so the pipeline can be
-triggered with a single command instead of running notebooks manually), the
-Flask API, the polished ERD export, and final documentation.
+Airflow DAG 
+Flask API (app.py) — at least one aggregated-report endpoint querying the Fact
+Final documentation 
 
-## Local development (without Docker)
 
-Not really supported — the whole point of this setup is that Docker is the
-only dependency. If you want faster iteration on a notebook, just edit it in
-JupyterLab at localhost:8888; changes save straight back to your host
-`notebooks/` folder since it's bind-mounted.
