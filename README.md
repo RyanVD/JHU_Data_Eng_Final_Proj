@@ -43,7 +43,7 @@ for the full dataset writeup (join columns, field descriptions, sample data).
 
 1. Copy the env file and add yours or my api key from whatsapp
    cp .env.example .env
-   # then edit .env and set FRED_API_KEY=...
+   then edit .env and set FRED_API_KEY=
    ```
 2. Build and start everything:
    ```bash
