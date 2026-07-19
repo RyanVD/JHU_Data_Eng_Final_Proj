@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(pandoc -t markdown \"C:\\\\Users\\\\Ryan\\\\Downloads\\\\Datasets Check-In_ Housing Cost & Mental Health Pipeline \\(1\\).docx\")",
-      "Bash(python -c \"import docx\")"
-    ]
-  }
-}
