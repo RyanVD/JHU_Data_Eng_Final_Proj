@@ -24,5 +24,3 @@ shared/PLACES__*.csv
 .vscode/
 .idea/
 
-# Claude Code local config - not project-relevant
-.claude/
