@@ -1,0 +1,25 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+*.log
+.ipynb_checkpoints/
+
+# Airflow (runtime state lands in shared/airflow/ due to the AIRFLOW_HOME bind mount,
+# so these need to match at any depth, not just a top-level airflow/ folder)
+**/airflow/logs/
+**/airflow/*.db
+**/airflow/*.pid
+**/airflow/airflow.cfg
+**/airflow/webserver_config.py
+**/airflow/standalone_admin_password.txt
+
+# Large raw data dumps - track small/sample files, but keep big downloads out of git
+# (add specific large files/patterns here as your team adds datasets)
+shared/PLACES__*.csv
+
+# OS/editor
+.DS_Store
+.vscode/
+.idea/

@@ -1,0 +1,63 @@
+services:
+  postgres:
+    image: postgres:16.3
+    container_name: project_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: jhu
+      POSTGRES_PASSWORD: jhu123
+      POSTGRES_DB: jhu
+    ports:
+      - "5433:5432" # host container
+    volumes:
+      - pgdata:/var/lib/postgresql/data # persistent DB storage
+      - ./shared:/home/jhu # shared file drop for raw CSVs
+      - ./db/init:/docker-entrypoint-initdb.d # CREATE TABLE scripts first startup
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jhu -d jhu"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  airflow-jupyter:
+    build: .
+    container_name: project_app
+    env_file: .env # loads FRED_API_KEY
+    ports:
+      - "8888:8888" # Jupyter Lab UI
+      - "8080:8080" # DAG dashboard
+      - "5000:5000" # Flask API
+    volumes:
+      - ./shared:/home/jhu
+      - ./notebooks:/home/jhu/notebooks
+    depends_on:
+      postgres:
+        condition: service_healthy # wait for postgres healthcheck
+    environment:
+      - AIRFLOW_HOME=/home/jhu/airflow
+      - AIRFLOW__CORE__DAGS_FOLDER=/home/jhu/airflow/dags
+    command: >
+      bash -c "
+      mkdir -p /home/jhu/airflow/dags &&
+      airflow db init &&
+      (airflow users create -r Admin -u admin -p admin -e admin@example.com -f Admin -l User || true) &&
+      airflow webserver -p 8080 &
+      airflow scheduler &
+      python /home/jhu/app.py &
+      jupyter lab --ip=0.0.0.0 --no-browser --allow-root --LabApp.token='' --LabApp.password=''"
+      # each & backgrounds a process so the next one can start; container stays alive as long as one keeps running
+
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: jhu_pgadmin
+    environment: # pgAdmin UI — browser
+      PGADMIN_DEFAULT_EMAIL: "student@jhu.edu"
+      PGADMIN_DEFAULT_PASSWORD: "password123"
+    ports:
+      - "8085:80"
+    depends_on:
+      - postgres
+
+volumes:
+  pgdata: # named volume declaration, used by postgres above
