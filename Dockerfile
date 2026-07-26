@@ -2,6 +2,8 @@ FROM python:3.11-slim
 
 WORKDIR /home/jhu
 
+COPY app.py /home/jhu/app.py
+
 ENV AIRFLOW_VERSION=2.9.3
 ENV PYTHON_VERSION=3.11
 
