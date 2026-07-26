@@ -30,6 +30,7 @@ services:
     volumes:
       - ./shared:/home/jhu
       - ./notebooks:/home/jhu/notebooks
+      - ./app.py:/home/jhu/app.py
     depends_on:
       postgres:
         condition: service_healthy # wait for postgres healthcheck
