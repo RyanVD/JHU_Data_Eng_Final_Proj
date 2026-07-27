@@ -105,4 +105,105 @@ Airflow DAG
 Flask API (app.py) — at least one aggregated-report endpoint querying the Fact
 Final documentation 
 
+# Project Status
 
+## Completed Features
+
+- Designed and implemented a PostgreSQL star-schema database with three dimension tables, one bridge table, and three fact tables.
+- Built automated extraction pipelines for CDC PLACES, FRED/FHFA housing data, and HUD Point-in-Time homelessness data.
+- Developed a data transformation notebook that cleans, joins, and loads all datasets into the final database schema.
+- Created an Apache Airflow DAG that executes the complete ETL pipeline using Papermill.
+- Developed a Flask REST API that connects to PostgreSQL and provides aggregated reporting endpoints.
+- Containerized the entire project using Docker Compose, including PostgreSQL, pgAdmin, Airflow, JupyterLab, and the Flask application.
+- Designed and documented the project's Entity Relationship Diagram (ERD).
+
+---
+
+# API Endpoints
+
+## GET /health
+
+Verifies that the Flask application can successfully connect to the PostgreSQL database.
+
+Example response:
+
+```json
+{
+  "database": "connected",
+  "status": "healthy"
+}
+```
+
+---
+
+## GET /api/state-summary
+
+Returns aggregated housing, mental health, sleep, and homelessness statistics by state and year.
+
+### Optional Parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| state | Two-letter state abbreviation (ex. TX) |
+| year | Four-digit year (ex. 2023) |
+
+Example request:
+
+```
+/api/state-summary?state=TX&year=2023
+```
+
+Example response:
+
+```json
+{
+  "data": [
+    {
+      "average_housing_price_index": 429.97,
+      "average_poor_mental_health_pct": 17.41,
+      "average_poor_sleep_pct": null,
+      "average_rent": 399.64,
+      "county_count": 253,
+      "estimated_homeless_count": 27325.11,
+      "mortgage_rate_30yr": 6.81,
+      "state": "TX",
+      "year": 2023
+    }
+  ],
+  "filters": {
+    "state": "TX",
+    "year": 2023
+  },
+  "result_count": 1
+}
+```
+
+---
+
+# Airflow Workflow
+
+The ETL pipeline is orchestrated through the `housing_cost_mental_health_pipeline` DAG.
+
+Execution order:
+
+```
+create_output_directory
+        ↓
+extract_cdc_places
+        ↓
+extract_fred_housing
+        ↓
+extract_hud_homelessness
+        ↓
+join_and_load_data
+```
+
+Each notebook executes sequentially using Papermill. The final notebook transforms the extracted datasets and reloads the dimension, bridge, and fact tables into PostgreSQL.
+
+---
+
+# Data Notes
+
+- CDC PLACES provides different health indicators depending on the reporting year. As a result, some state-year combinations contain `null` values for either the poor mental health or poor sleep measure.
+- HUD homelessness data is reported at the Continuum of Care (CoC) level. County estimates are calculated using the `Bridge_CoC_County` overlap ratios before being aggregated to the state level.
+- Mortgage rates and rent values come from national-level datasets and are included to provide economic context alongside county-level housing and mental health data.

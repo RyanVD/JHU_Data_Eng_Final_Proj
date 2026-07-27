@@ -31,6 +31,7 @@ services:
       - ./shared:/home/jhu
       - ./notebooks:/home/jhu/notebooks
       - ./app.py:/home/jhu/app.py
+      - ./dags:/home/jhu/airflow/dags
     depends_on:
       postgres:
         condition: service_healthy # wait for postgres healthcheck
