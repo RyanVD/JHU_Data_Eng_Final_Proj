@@ -56,7 +56,7 @@ for the full dataset writeup (join columns, field descriptions, sample data).
 3. Local host access:
    - **JupyterLab:** http://localhost:8888 (no login token)
    - **Airflow UI:** http://localhost:8080 (admin/admin)
-   - **Flask API:** http://localhost:5000 (not built yet — see Status below)
+   - **Flask API:** http://localhost:5000 
    - **pgAdmin:** http://localhost:8085 (`student@jhu.edu` / `password123`) —
      register a server manually: host `postgres`, port `5432`, user `jhu`,
      password `jhu123`, db `jhu`. This registration isn't persisted across a
