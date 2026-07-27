@@ -98,12 +98,6 @@ tables each time it runs, so it's safe to re-run after re-running `01`-`03`.
   SQLAlchemy <2.0 and silently breaks `to_sql`/`read_sql` with
   `AttributeError: 'Engine' object has no attribute 'cursor'` if you bump it.
 
-## Status / what's left
-TODO — next up
-
-Airflow DAG 
-Flask API (app.py) — at least one aggregated-report endpoint querying the Fact
-Final documentation 
 
 # Project Status
 
